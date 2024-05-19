@@ -1,14 +1,28 @@
-import Image from "next/image";
-import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] });
+import ClientComponent from "@/components/ClientComponent";
+import { fetchAccessToken } from "@humeai/voice";
+import { useEffect, useState } from "react";
 
-export default function Home() {
-  return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-     Hello I am Sarah a AI powered ChatBot. 
-    </main>
-  );
+export default function Page() {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  useEffect(() => {
+
+    const getToken = async () => {
+      const resp = await fetchAccessToken({
+        apiKey: String(process.env.NEXT_PUBLIC_HUME_API_KEY),
+        clientSecret: String(process.env.NEXT_PUBLIC_HUME_CLIENT_SECRET),
+      });
+
+      setAccessToken(resp);
+    }
+    getToken();
+
+  }, [])
+
+
+  if (!accessToken) {
+    return <div>Loading...</div>;
+  }
+
+  return <ClientComponent accessToken={accessToken} />;
 }
